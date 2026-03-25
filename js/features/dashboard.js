@@ -828,11 +828,18 @@ if (btnLimparMes) btnLimparMes.addEventListener('click', async () => {
     });
 
     if (logoutBtn) logoutBtn.addEventListener('click', async () => {
-      if (await Core.ui.confirm('Deseja realmente sair?', 'Confirmar')) {
-        Core.user.clearSession();
-        window.location.href = 'index.html';
-      }
-    });
+  if (!confirm('Deseja realmente sair?')) return;
+
+  try {
+    await window.firebaseApi?.signOut?.();
+  } catch (e) {
+    console.warn('[Logout] Falha ao encerrar sessão Firebase:', e);
+  }
+
+  localStorage.removeItem('gf_erp_firebase_rest_session');
+  Core.user.clearSession();
+  window.location.href = 'index.html';
+});
 
     // forms
     if (formPoupanca) formPoupanca.addEventListener('submit', (e) => {
