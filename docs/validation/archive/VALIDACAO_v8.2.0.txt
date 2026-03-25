@@ -1,0 +1,142 @@
+VALIDAÇÃO — ERP JW Finance v8.2.0
+Data: 2026-02-18
+Tipo: Reorganização Estrutural + Documentação
+
+═══════════════════════════════════════════════════
+ESCOPO DA VERSÃO
+═══════════════════════════════════════════════════
+
+v8.2.0 é uma versão de reorganização (estrutural + docs).
+NÃO altera fórmulas, schemas ou lógica de negócio.
+Risco: Baixo.
+
+Mudanças principais:
+  - js/constantes.js    → js/core/constants.js
+  - js/core.js          → js/core/core.js
+  - js/config.js        → js/core/config.js
+  - js/script.js        → js/utils/ui.js
+  - js/[feature].js     → js/features/[feature].js
+  - Todos os <script src> nos HTMLs atualizados
+  - Service Worker cache paths atualizados
+
+═══════════════════════════════════════════════════
+CHECKLIST DE REGRESSÃO (marcar com [X] ao validar)
+═══════════════════════════════════════════════════
+
+[ ] 1. CARREGAMENTO
+    [ ] index.html abre sem erros no console
+    [ ] dashboard.html abre sem erros no console
+    [ ] charts.html abre sem erros no console
+    [ ] consolidado.html abre sem erros no console
+    [ ] historico.html abre sem erros no console
+    [ ] metas.html abre sem erros no console
+    [ ] perfil.html abre sem erros no console
+    [ ] gerenciadores.html abre sem erros no console
+
+[ ] 2. AUTENTICAÇÃO
+    [ ] Cadastro: criar conta nova com e-mail + senha
+    [ ] Login: entrar com conta existente
+    [ ] Logout: sessão limpa, redireciona para index
+    [ ] Proteção: dashboard.html redireciona para login se não autenticado
+
+[ ] 3. LANÇAMENTOS (Dashboard)
+    [ ] Adicionar receita → saldo atualiza
+    [ ] Adicionar poupança → saldo diminui
+    [ ] Adicionar despesa essencial → saldo diminui
+    [ ] Adicionar despesa livre → saldo diminui
+    [ ] Adicionar dívida → saldo diminui
+    [ ] Editar lançamento → valores atualizados
+    [ ] Excluir lançamento → removido da lista e saldo recalculado
+    [ ] Lançamento com valor zero: bloqueado com mensagem
+
+[ ] 4. FÓRMULAS
+    [ ] Saldo = Renda − Poupança − Essenciais − Livres − Dívidas
+    [ ] Mês sem receita: Score mostra "—" (não NaN/Infinity)
+    [ ] Mês sem receita: Taxas mostram "—" (não NaN/Infinity)
+    [ ] Score entre 0 e 100 (sem valores fora do range)
+
+[ ] 5. RECORRÊNCIAS
+    [ ] Fixar lançamento: recorrência criada
+    [ ] Navegar para próximo mês: recorrência aplicada automaticamente
+    [ ] Excluir recorrência "somente este mês": outros meses intactos
+    [ ] Excluir recorrência "este e futuros": meses passados intactos
+
+[ ] 6. NAVEGAÇÃO ENTRE MESES
+    [ ] Prev/Next/Atual: carrega dados do mês correto
+    [ ] Dados de meses diferentes são isolados
+    [ ] selectedMonth persiste após F5
+
+[ ] 7. GRÁFICOS (Offline)
+    [ ] Pizza (Macro) renderiza sem internet
+    [ ] Barras (Comparativo) renderiza sem internet
+    [ ] Barras (Categorias) renderiza sem internet
+    [ ] Barras (Bancos) renderiza sem internet
+    [ ] Linha (Evolução Saldo) renderiza sem internet
+    [ ] Filtro por período aplica corretamente
+
+[ ] 8. CONSOLIDADO
+    [ ] KPIs do período somam corretamente
+    [ ] Saldo por banco calcula (receita+ poupança+ − despesa− dívida−)
+    [ ] Export CSV: arquivo gerado com BOM
+
+[ ] 9. HISTÓRICO
+    [ ] Estado vazio: "Selecione um período" exibido
+    [ ] Filtro aplicado: cards por mês aparecem
+    [ ] Clicar no card: abre mês no Dashboard
+    [ ] Export CSV do período: arquivo gerado
+
+[ ] 10. METAS/ORÇAMENTO
+    [ ] Percentuais somam 100%: salvar funciona
+    [ ] Percentuais ≠ 100%: mensagem de erro
+    [ ] Comparativo Meta vs Realizado exibe corretamente
+    [ ] Navegação prev/next/atual do mês funciona
+
+[ ] 11. GERENCIADORES
+    [ ] Listar categorias por grupo
+    [ ] Ativar/desativar categoria: reflete nos selects do Dashboard
+    [ ] Renomear categoria: aparece nos formulários
+    [ ] Adicionar categoria customizada
+    [ ] Resetar: restaura defaults
+    [ ] Mesmas ações para bancos
+
+[ ] 12. PERFIL
+    [ ] Alterar senha: nova senha funciona no próximo login
+    [ ] Senha atual errada: mensagem de erro
+    [ ] Nova senha < 6 chars: mensagem de erro
+    [ ] Exportar backup: JSON válido gerado
+    [ ] Importar backup: dados restaurados sem apagar existentes
+
+[ ] 13. BACKUP COMPLETO
+    [ ] Exportar backup
+    [ ] Limpar localStorage (manualmente pelo DevTools)
+    [ ] Importar backup
+    [ ] Verificar: todos os dados restaurados
+
+[ ] 14. PWA / SERVICE WORKER
+    [ ] Registro do SW sem erros (em http:// ou https://)
+    [ ] Cache atualizado com novos paths (js/core/, js/features/, etc.)
+    [ ] App funciona offline após primeiro carregamento
+
+[ ] 15. MIGRAÇÃO (usuário legado v4.x)
+    [ ] Dados em `gf_erp_tx_YYYY-MM` são migrados para `gf_erp_tx_{userId}_YYYY-MM`
+    [ ] Migração roda uma única vez (flag migratedFlag)
+    [ ] Dados originais não são removidos (segurança)
+
+═══════════════════════════════════════════════════
+RESULTADO
+═══════════════════════════════════════════════════
+
+Total itens: 60
+Aprovados: ___
+Reprovados: ___
+Bloqueantes: ___
+
+Status: [ ] APROVADO  [ ] REPROVADO  [ ] APROVADO COM RESSALVAS
+
+Observações:
+_____________________________________________
+_____________________________________________
+_____________________________________________
+
+Validado por: _______________________
+Data: ______________________________

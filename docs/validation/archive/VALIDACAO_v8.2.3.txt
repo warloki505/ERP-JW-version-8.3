@@ -1,0 +1,175 @@
+=============================================================
+  CHECKLIST DE VALIDAÇÃO — ERP JW Finance v8.2.3
+  Data: 2026-02-19
+  Responsável: ___________
+=============================================================
+
+INSTRUÇÕES
+----------
+Marque [x] para cada item validado com sucesso.
+Marque [F] para falha e descreva abaixo com detalhes.
+Todos os itens são OBRIGATÓRIOS antes de publicar.
+
+=============================================================
+  BLOCO 1 — CARREGAMENTO E AUTENTICAÇÃO
+=============================================================
+
+[ ] 1.1  index.html abre sem erros no console do navegador
+[ ] 1.2  Criar conta nova (nome + e-mail + senha) — redirecionamento para Dashboard
+[ ] 1.3  Login com usuário existente funciona
+[ ] 1.4  Logout redireciona para index.html e limpa sessão
+[ ] 1.5  Dois usuários diferentes no mesmo navegador têm dados isolados
+
+=============================================================
+  BLOCO 2 — DASHBOARD: SCORE DO MÊS (NOVO v8.2.3)
+=============================================================
+
+[ ] 2.1  Painel "Resumo do mês" exibe APENAS o Score do mês (pill minimalista)
+[ ] 2.2  KPIs individuais de Poupança / Endividamento / Despesas NÃO aparecem no painel
+[ ] 2.3  Score exibe tonalidade verde (ok) quando score ≥ 80
+[ ] 2.4  Score exibe tonalidade amarela (warn) quando score entre 60 e 79
+[ ] 2.5  Score exibe tonalidade vermelha (error) quando score < 60
+[ ] 2.6  Score exibe "Score do mês: —" quando não há receita no mês
+[ ] 2.7  Score atualiza corretamente ao trocar de mês
+
+=============================================================
+  BLOCO 3 — DASHBOARD: LANÇAMENTOS
+=============================================================
+
+[ ] 3.1  Lançar Receita — valor, categoria, banco, data → aparece na tabela
+[ ] 3.2  Lançar Poupança — idem
+[ ] 3.3  Lançar Despesa Essencial — categoria muda subtipo automaticamente
+[ ] 3.4  Lançar Despesa Livre — idem
+[ ] 3.5  Lançar Dívida — idem
+[ ] 3.6  Editar lançamento existente (✏️) — valores salvos corretamente
+[ ] 3.7  Excluir lançamento (🗑️) — confirmação exibida, item removido
+[ ] 3.8  Tabela ordenada por data decrescente
+
+=============================================================
+  BLOCO 4 — DASHBOARD: VALIDAÇÃO DE DATA (v8.2.1)
+=============================================================
+
+[ ] 4.1  Input de data de RECEITA tem min/max igual ao mês ativo
+[ ] 4.2  Input de data de POUPANÇA tem min/max igual ao mês ativo
+[ ] 4.3  Input de data de DESPESA tem min/max igual ao mês ativo
+[ ] 4.4  Input de data de DÍVIDA tem min/max igual ao mês ativo
+[ ] 4.5  Ao trocar de mês, os min/max dos inputs atualizam corretamente
+[ ] 4.6  Após submit do formulário, o campo de data reseta dentro do intervalo do mês
+
+=============================================================
+  BLOCO 5 — DASHBOARD: SELECTS (v8.2.1)
+=============================================================
+
+[ ] 5.1  Ao abrir formulário de Receita: "Selecione" aparece como estado inicial
+[ ] 5.2  Após selecionar categoria: "Selecione" NÃO reaparece como opção
+[ ] 5.3  Idem para Banco em Receita
+[ ] 5.4  Idem para Poupança (categoria e banco)
+[ ] 5.5  Idem para Despesa (categoria e banco)
+[ ] 5.6  Idem para Dívida (categoria e banco)
+[ ] 5.7  Lista de categorias de Despesa contém itens Essencial + Livre mesclados
+[ ] 5.8  Itens desativados nos Gerenciadores NÃO aparecem nos selects
+
+=============================================================
+  BLOCO 6 — DASHBOARD: KPIs E NAVEGAÇÃO DE MÊS
+=============================================================
+
+[ ] 6.1  Botão "← Anterior" carrega mês anterior e atualiza label e KPIs
+[ ] 6.2  Botão "Mês Atual" retorna ao mês corrente
+[ ] 6.3  Botão "Próximo →" avança um mês
+[ ] 6.4  KPIs (Renda, Poupança, Essenciais, Livres, Dívidas, Saldo) atualizam ao trocar mês
+[ ] 6.5  Saldo negativo exibido em vermelho, saldo positivo em verde
+[ ] 6.6  Mês selecionado persiste ao navegar para outra tela e voltar
+
+=============================================================
+  BLOCO 7 — DASHBOARD: RECORRÊNCIAS
+=============================================================
+
+[ ] 7.1  Fixar lançamento (📌) abre modal com dados preenchidos
+[ ] 7.2  Salvar recorrência — lançamento aparece com ícone 📌 na tabela
+[ ] 7.3  Ao navegar para mês futuro dentro do range, recorrência é aplicada automaticamente
+[ ] 7.4  Excluir "somente este mês" remove apenas do mês atual, recorrência permanece
+[ ] 7.5  Excluir "este mês e futuros" remove a recorrência completamente
+
+=============================================================
+  BLOCO 8 — GRÁFICOS (v8.2.1 / v8.2.2)
+=============================================================
+
+[ ] 8.1  charts.html carrega sem erros
+[ ] 8.2  Selects de Mês inicial e Mês final listam apenas meses com dados
+[ ] 8.3  Clicar "🔄 Atualizar" com range de 1 mês — gráfico de linha exibe 1 ponto
+[ ] 8.4  Clicar "🔄 Atualizar" com range de 3+ meses — gráfico de linha percorre todos
+[ ] 8.5  Label "Período atual" atualiza para refletir o range selecionado
+[ ] 8.6  Com range inválido/vazio: gráfico de evolução usa mês ativo como fallback (sem tela branca)
+[ ] 8.7  Gráfico Pizza (Macro) e Barras (Comparativo) refletem KPIs do período
+[ ] 8.8  Gráfico "Despesas por Categoria" correto para o período selecionado
+[ ] 8.9  Gráfico "Categorias por Banco" correto para o período selecionado
+[ ] 8.10 Todos os gráficos renderizam sem internet (offline-first)
+
+=============================================================
+  BLOCO 9 — METAS / ORÇAMENTO (v8.2.1)
+=============================================================
+
+[ ] 9.1  metas.html carrega sem erros
+[ ] 9.2  Título do card exibe "📊 Orçamento — [mês ativo]"
+[ ] 9.3  Botões Anterior / Mês Atual / Próximo estão no TOPO do card
+[ ] 9.4  Trocar mês pelos botões atualiza título e cards comparativos
+[ ] 9.5  Percentuais salvos para um mês não afetam outros meses
+[ ] 9.6  Soma ≠ 100% impede salvar e exibe mensagem de erro
+[ ] 9.7  Cards comparativos (Poupança, Essenciais, Livres, Dívidas) calculam corretamente
+[ ] 9.8  Status geral (Em linha / Ajustes / Atenção) coerente com os cards
+[ ] 9.9  Botão "Restaurar padrão" repõe 20/50/20/10
+
+=============================================================
+  BLOCO 10 — CONSOLIDADO E HISTÓRICO
+=============================================================
+
+[ ] 10.1  consolidado.html exibe totais por tipo entre os meses existentes
+[ ] 10.2  historico.html lista lançamentos com filtros funcionando
+[ ] 10.3  Export CSV no histórico gera arquivo com dados corretos
+
+=============================================================
+  BLOCO 11 — GERENCIADORES E PERFIL
+=============================================================
+
+[ ] 11.1  Adicionar categoria customizada → aparece nos selects do Dashboard
+[ ] 11.2  Desativar categoria → some dos selects do Dashboard
+[ ] 11.3  Adicionar banco customizado → aparece nos selects do Dashboard
+[ ] 11.4  Perfil salva nome do usuário corretamente
+[ ] 11.5  Export de backup JSON gerado sem erros e com todos os dados
+[ ] 11.6  Import de backup JSON restaura todos os dados sem perda
+
+=============================================================
+  BLOCO 12 — PWA / SERVICE WORKER (v8.2.2)
+=============================================================
+
+[ ] 12.1  Service Worker registrado (DevTools → Application → Service Workers)
+[ ] 12.2  CACHE_NAME no sw.js = erp-jw-finance-v8.2.3
+[ ] 12.3  Desligar internet e recarregar → app funciona normalmente
+[ ] 12.4  manifest.json válido (ícone, nome, start_url)
+[ ] 12.5  Após atualização de versão: hard refresh (Ctrl+Shift+R) limpa cache antigo
+
+=============================================================
+  BLOCO 13 — MIGRAÇÃO DE DADOS LEGADOS
+=============================================================
+
+[ ] 13.1  Dados de usuário v4.x (chaves antigas gf_erp_*) são migrados automaticamente
+[ ] 13.2  Após migração, dados aparecem corretamente nas telas
+[ ] 13.3  Migração não duplica dados em execuções subsequentes (idempotente)
+
+=============================================================
+  RESULTADO
+=============================================================
+
+Total de itens: 62
+Aprovados:  ___
+Falhas:     ___
+
+FALHAS REGISTRADAS:
+-------------------
+Item ___: ____________________________________________
+Item ___: ____________________________________________
+Item ___: ____________________________________________
+
+Assinatura: ___________________ Data: _______________
+Status: [ ] APROVADO   [ ] REPROVADO
+=============================================================

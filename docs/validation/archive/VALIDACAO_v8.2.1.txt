@@ -1,0 +1,163 @@
+=============================================================
+  CHECKLIST DE VALIDAÇÃO — ERP JW Finance v8.2.1
+  Data: 2026-02-18
+  Responsável: ___________
+=============================================================
+
+INSTRUÇÕES
+----------
+Marque [x] para cada item validado com sucesso.
+Marque [F] para falha e descreva abaixo.
+Todos os itens são OBRIGATÓRIOS antes de publicar.
+
+=============================================================
+  BLOCO 1 — CARREGAMENTO E AUTENTICAÇÃO
+=============================================================
+
+[ ] 1.1  index.html abre sem erros no console
+[ ] 1.2  Criar conta nova (nome + e-mail + senha)
+[ ] 1.3  Login com usuário existente
+[ ] 1.4  Logout redireciona para index.html
+[ ] 1.5  Usuário diferente no mesmo navegador tem dados isolados
+
+=============================================================
+  BLOCO 2 — DASHBOARD: LANÇAMENTOS
+=============================================================
+
+[ ] 2.1  Lançar Receita — valor, categoria, banco, data → aparece na tabela
+[ ] 2.2  Lançar Poupança — idem
+[ ] 2.3  Lançar Despesa Essencial — categoria muda subtipo automaticamente
+[ ] 2.4  Lançar Despesa Livre — idem
+[ ] 2.5  Lançar Dívida — idem
+[ ] 2.6  Editar lançamento existente (✏️) — valores salvos corretamente
+[ ] 2.7  Excluir lançamento (🗑️) — confirmação exibida, item removido
+[ ] 2.8  Tabela ordenada por data decrescente
+
+=============================================================
+  BLOCO 3 — DASHBOARD: VALIDAÇÃO DE DATA (NOVO v8.2.1)
+=============================================================
+
+[ ] 3.1  Input de data de RECEITA tem min/max igual ao mês ativo
+[ ] 3.2  Input de data de POUPANÇA tem min/max igual ao mês ativo
+[ ] 3.3  Input de data de DESPESA tem min/max igual ao mês ativo
+[ ] 3.4  Input de data de DÍVIDA tem min/max igual ao mês ativo
+[ ] 3.5  Ao trocar de mês (botão Anterior/Próximo), os min/max dos inputs atualizam
+[ ] 3.6  Não é possível digitar data fora do mês ativo nos inputs nativos
+
+=============================================================
+  BLOCO 4 — DASHBOARD: SELECTS (CORRIGIDO v8.2.1)
+=============================================================
+
+[ ] 4.1  Ao abrir formulário de Receita: "Selecione" aparece como estado inicial
+[ ] 4.2  Após selecionar categoria: "Selecione" NÃO reaparece como opção
+[ ] 4.3  Idem para Banco em Receita
+[ ] 4.4  Idem para Poupança (categoria e banco)
+[ ] 4.5  Idem para Despesa (categoria e banco)
+[ ] 4.6  Idem para Dívida (categoria e banco)
+[ ] 4.7  Lista de categorias de Despesa contém apenas itens ativos (Essencial + Livre)
+[ ] 4.8  Itens inativos nos Gerenciadores NÃO aparecem nos selects
+
+=============================================================
+  BLOCO 5 — DASHBOARD: NAVEGAÇÃO DE MÊS E KPIs
+=============================================================
+
+[ ] 5.1  Botão "← Anterior" carrega mês anterior e atualiza label
+[ ] 5.2  Botão "Mês Atual" volta ao mês corrente
+[ ] 5.3  Botão "Próximo →" avança um mês
+[ ] 5.4  KPIs (Renda, Poupança, Essenciais, Livres, Dívidas, Saldo) atualizam ao trocar mês
+[ ] 5.5  Saldo negativo exibido em vermelho
+[ ] 5.6  Saldo positivo exibido em verde
+[ ] 5.7  Indicadores de saúde (Poupança, Endividamento, Despesas, Score) calculam corretamente
+[ ] 5.8  Mês selecionado persiste ao navegar para outra tela e voltar
+
+=============================================================
+  BLOCO 6 — DASHBOARD: RECORRÊNCIAS
+=============================================================
+
+[ ] 6.1  Fixar lançamento (📌) abre modal com dados preenchidos
+[ ] 6.2  Salvar recorrência — lançamento fixo aparece com 📌 na tabela
+[ ] 6.3  Ao navegar para mês futuro, recorrência é aplicada automaticamente
+[ ] 6.4  Excluir "somente este mês" remove apenas do mês atual
+[ ] 6.5  Excluir "este mês e futuros" remove da série completa
+
+=============================================================
+  BLOCO 7 — GRÁFICOS (CORRIGIDO v8.2.1)
+=============================================================
+
+[ ] 7.1  charts.html carrega sem erros
+[ ] 7.2  Selects de Mês inicial e Mês final populados com meses existentes
+[ ] 7.3  Clicar "🔄 Atualizar" com range de 1 mês — gráfico de linha exibe 1 ponto
+[ ] 7.4  Clicar "🔄 Atualizar" com range de 3+ meses — gráfico de linha exibe todos os meses
+[ ] 7.5  Label "Período atual" atualiza para refletir o range selecionado
+[ ] 7.6  Gráfico pizza (Macro) reflete KPIs do período
+[ ] 7.7  Gráfico de barras (Comparativo) reflete KPIs do período
+[ ] 7.8  Gráfico "Despesas por Categoria" correto para o período
+[ ] 7.9  Gráfico "Categorias por Banco" correto para o período
+[ ] 7.10 Todos os gráficos renderizam offline (sem internet)
+
+=============================================================
+  BLOCO 8 — METAS / ORÇAMENTO (MODIFICADO v8.2.1)
+=============================================================
+
+[ ] 8.1  metas.html carrega sem erros
+[ ] 8.2  Título do card exibe "📊 Orçamento — [mês ativo]"
+[ ] 8.3  Botões Anterior / Mês Atual / Próximo estão no TOPO do card (não no rodapé)
+[ ] 8.4  Trocar mês pelos botões atualiza o título e os cards comparativos
+[ ] 8.5  Percentuais salvos para um mês não afetam outros meses
+[ ] 8.6  Soma dos percentuais diferente de 100% impede salvar (mensagem de erro)
+[ ] 8.7  Cards comparativos (Poupança, Essenciais, Livres, Dívidas) calculam corretamente
+[ ] 8.8  Status geral (Em linha / Ajustes / Atenção) coerente com os cards
+[ ] 8.9  Botão "Restaurar padrão" repõe 20/50/20/10
+
+=============================================================
+  BLOCO 9 — CONSOLIDADO E HISTÓRICO
+=============================================================
+
+[ ] 9.1  consolidado.html exibe totais por tipo entre os meses existentes
+[ ] 9.2  historico.html lista todos os lançamentos com filtros funcionando
+[ ] 9.3  Export CSV no histórico gera arquivo correto
+
+=============================================================
+  BLOCO 10 — GERENCIADORES E PERFIL
+=============================================================
+
+[ ] 10.1  Adicionar categoria customizada e verificar que aparece no Dashboard
+[ ] 10.2  Desativar categoria e verificar que SOME do Dashboard
+[ ] 10.3  Adicionar banco customizado e verificar que aparece no Dashboard
+[ ] 10.4  Perfil salva nome do usuário
+[ ] 10.5  Export de backup JSON gerado sem erros
+[ ] 10.6  Import de backup JSON restaura todos os dados
+
+=============================================================
+  BLOCO 11 — PWA / OFFLINE
+=============================================================
+
+[ ] 11.1  Service Worker registrado (DevTools → Application → Service Workers)
+[ ] 11.2  Cache name: erp-jw-finance-v8.2.1
+[ ] 11.3  Desligar internet e recarregar → aplicação funciona normalmente
+[ ] 11.4  manifest.json válido (ícone, nome, start_url)
+
+=============================================================
+  BLOCO 12 — MIGRAÇÃO DE DADOS LEGADOS
+=============================================================
+
+[ ] 12.1  Dados de usuário v4.x (chaves antigas gf_erp_*) são migrados automaticamente
+[ ] 12.2  Após migração, dados aparecem corretamente nas telas
+[ ] 12.3  Migração não duplica dados em execuções subsequentes
+
+=============================================================
+  RESULTADO
+=============================================================
+
+Total de itens: 60
+Aprovados:  ___
+Falhas:     ___
+
+FALHAS REGISTRADAS:
+-------------------
+Item ___: ____________________________________________
+Item ___: ____________________________________________
+
+Assinatura: ___________________ Data: _______________
+Status: [ ] APROVADO   [ ] REPROVADO
+=============================================================
