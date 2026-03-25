@@ -1,0 +1,25 @@
+ERP JW Finance v8.2.6 — Production Validation Patch
+Data: 2026-03-18
+
+AJUSTES PRINCIPAIS
+- firebase-init.js trocado para carregamento por script clássico (sem type=module nos HTMLs)
+- eliminação do risco residual de race condition no boot do login
+- index.js simplificado para iniciar pelo evento firebase-ready ou por timeout de segurança
+- service worker atualizado para novo cache v8.2.6
+
+ARQUIVOS ALTERADOS
+- index.html
+- dashboard.html
+- consolidado.html
+- charts.html
+- historico.html
+- metas.html
+- perfil.html
+- gerenciadores.html
+- js/core/firebase-init.js
+- js/features/index.js
+- sw.js
+
+OBJETIVO
+- deixar a autenticação REST sem gstatic pronta para validação em produção no GitHub Pages
+- reduzir risco de bloqueio por CSP, antivírus e diferenças de ordem de carregamento entre navegadores

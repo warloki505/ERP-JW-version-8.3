@@ -1,0 +1,45 @@
+ERP JW Finance v8.3.0 — Fase 3 (Sincronização Multi-Device)
+Data: 2026-03-22
+
+ENTREGAS PRINCIPAIS
+- nova camada js/sync/sync-service.js com fila local persistida em localStorage
+- sincronização híbrida localStorage + Firestore REST reaproveitando autenticação Firebase REST existente
+- bootstrap remoto em novo dispositivo após login Firebase
+- normalização de schema de transações com createdAt, updatedAt, deletedAt, deviceId e schemaVersion
+- soft delete no dashboard para evitar ressurreição de registros
+- polling remoto a cada 10 segundos + retry automático quando online
+- indicador visual de status de sincronização na topbar
+- compatibilidade preservada com backup/restore, histórico, gráficos, metas e gerenciadores
+
+ARQUIVOS NOVOS
+- js/sync/sync-service.js
+- RELEASE_NOTES_v8.3.0.txt
+- docs/technical/FASE_3_SYNC_MULTI_DEVICE.md
+- docs/validation/VALIDACAO_v8.3.0.txt
+
+ARQUIVOS ALTERADOS
+- css/style.css
+- dashboard.html
+- historico.html
+- charts.html
+- metas.html
+- perfil.html
+- consolidado.html
+- gerenciadores.html
+- index.html
+- js/features/dashboard.js
+- js/features/historico.js
+- js/features/charts.js
+- js/features/consolidado.js
+- js/features/metas.js
+- js/features/perfil.js
+- js/features/gerenciadores.js
+- README.md
+- docs/VERSION.md
+- docs/INDEX.md
+- docs/changelog/CHANGELOG.md
+
+OBSERVAÇÕES
+- Core.js permanece como fonte única de verdade e não foi alterado.
+- A sincronização depende de login Firebase válido; em fallback local o sistema continua operacional offline.
+- Listener em tempo real do SDK não foi introduzido; a replicação remota usa Firestore REST + polling de 10s.

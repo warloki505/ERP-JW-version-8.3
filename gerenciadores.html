@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP JW Finance - Gerenciadores</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/core/firebase-init.js"></script>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container topbar__row">
+      <h1>🧩 ERP JW Finance - Gerenciadores</h1>
+      <div class="topbar__actions">
+        <button class="btn btn--ghost" type="button" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+        <button id="logoutBtn" class="btn btn--ghost" type="button">🚪 Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1100px; margin-top: 24px;">
+
+    <section class="card">
+      <h2>🧠 Listas Globais Inteligentes</h2>
+      <p class="text-muted" style="margin-top: 0;">
+        Aqui você controla as listas do ERP (Categorias e Bancos): <strong>ativar/desativar</strong>, <strong>renomear</strong> e <strong>adicionar itens personalizados</strong>.
+        <br/>Regras: itens padrão nunca são deletados (apenas desativados). Itens desativados <strong>não aparecem nos selects</strong>, mas <strong>continuam aparecendo no histórico</strong>.
+      </p>
+      <div class="status status--info">
+        Dica: após salvar, volte ao Dashboard e recarregue a página para ver os selects atualizados.
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="manager-grid">
+        <!-- Categorias -->
+        <div class="manager-card">
+          <div class="manager-header">
+            <h3 style="margin:0;">📌 Categorias</h3>
+            <select id="catGrupo" class="manager-select input">
+              <option value="receita">Receita</option>
+              <option value="poupanca">Poupança</option>
+              <option value="despesa_essencial">Despesa Essencial</option>
+              <option value="despesa_livre">Despesa Livre</option>
+              <option value="divida">Dívidas</option>
+            </select>
+          </div>
+
+          <div class="table-wrapper manager-table-wrap"><table class="manager-table"><thead><tr><th style="width:90px;">Ativo</th><th>Nome</th></tr></thead><tbody id="catLista"></tbody></table></div>
+
+          <div class="manager-actions">
+            <button id="btnAddCat" class="btn btn--ghost" type="button">＋ Adicionar item</button>
+            <button id="btnSalvarCats" class="btn btn--primary" type="button">Salvar</button>
+            <button id="btnResetCats" class="btn btn--ghost" type="button">Restaurar padrão</button>
+          </div>
+        </div>
+
+        <!-- Bancos -->
+        <div class="manager-card">
+          <div class="manager-header">
+            <h3 style="margin:0;">🏦 Bancos</h3>
+            <select id="bankTipo" class="manager-select input">
+              <option value="receita">Receita</option>
+              <option value="poupanca">Poupança</option>
+              <option value="despesa">Despesa</option>
+              <option value="divida">Dívidas</option>
+            </select>
+          </div>
+
+          <div class="table-wrapper manager-table-wrap"><table class="manager-table"><thead><tr><th style="width:90px;">Ativo</th><th>Nome</th></tr></thead><tbody id="bankLista"></tbody></table></div>
+
+          <div class="manager-actions">
+            <button id="btnAddBank" class="btn btn--ghost" type="button">＋ Adicionar item</button>
+            <button id="btnSalvarBanks" class="btn btn--primary" type="button">Salvar</button>
+            <button id="btnResetBanks" class="btn btn--ghost" type="button">Restaurar padrão</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="js/core/constants.js"></script>
+  <script src="js/core/config.js"></script>
+  <script src="js/core/core.js"></script>
+  <script src="js/utils/ui.js"></script>
+  <script src="js/sync/sync-service.js"></script>
+  <script src="js/features/gerenciadores.js"></script>
+</body>
+</html>

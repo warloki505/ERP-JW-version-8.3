@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP JW Finance - Gráficos</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/core/firebase-init.js"></script>
+</head>
+
+<body>
+  <header class="topbar no-print">
+    <div class="container topbar__row">
+      <h1>📈 ERP JW Finance - Gráficos</h1>
+      <div class="topbar__actions">
+        <button onclick="location.href='dashboard.html'" class="btn btn--ghost">← Dashboard</button>
+        <button id="logoutBtn" class="btn btn--ghost">🚪 Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="margin-top: 24px;">
+    <!-- FILTRO -->
+    <section class="card no-print">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+        <div>
+          <h3 style="margin:0;">🗓️ Filtro por Período</h3>
+          <p class="text-muted" style="margin:6px 0 0;">Selecione o intervalo e clique em <strong>Atualizar</strong>.</p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
+          <div class="form-group" style="min-width:220px; margin:0;">
+            <label for="chartsStart">Mês inicial</label>
+            <select id="chartsStart" class="input"></select>
+          </div>
+          <div class="form-group" style="min-width:220px; margin:0;">
+            <label for="chartsEnd">Mês final</label>
+            <select id="chartsEnd" class="input"></select>
+          </div>
+          <button id="btnApply" class="btn" type="button">🔄 Atualizar</button>
+        </div>
+      </div>
+      <div class="text-muted" style="margin-top:10px;">
+        Período atual: <strong id="monthLabel">—</strong>
+      </div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="card">
+      <h3>✅ Resumo Executivo — Indicadores do período</h3>
+
+      <div class="kpi-grid" style="margin-top: 12px;">
+        <div class="kpi kpi--renda"><div class="kpi__label">Renda Total</div><div id="kpiRenda" class="kpi__value">—</div></div>
+        <div class="kpi kpi--poupanca"><div class="kpi__label">Poupança</div><div id="kpiPoupanca" class="kpi__value">—</div></div>
+        <div class="kpi kpi--essenciais"><div class="kpi__label">Essenciais</div><div id="kpiEssenciais" class="kpi__value">—</div></div>
+        <div class="kpi kpi--livres"><div class="kpi__label">Livres</div><div id="kpiLivres" class="kpi__value">—</div></div>
+        <div class="kpi kpi--dividas"><div class="kpi__label">Dívidas</div><div id="kpiDividas" class="kpi__value">—</div></div>
+        <div class="kpi kpi--saldo"><div class="kpi__label">Saldo</div><div id="kpiSaldo" class="kpi__value">—</div></div>
+      </div>
+
+      <div class="rates-grid" style="margin-top:16px;">
+        <div class="rate">
+          <div class="rate__label">Taxa de Poupança</div>
+          <div id="percPoupanca" class="rate__value">—</div>
+        </div>
+        <div class="rate">
+          <div class="rate__label">Taxa de Essenciais</div>
+          <div id="percEssenciais" class="rate__value">—</div>
+        </div>
+        <div class="rate">
+          <div class="rate__label">Taxa de Livres</div>
+          <div id="percLivres" class="rate__value">—</div>
+        </div>
+        <div class="rate">
+          <div class="rate__label">Endividamento</div>
+          <div id="percDividas" class="rate__value">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GRÁFICOS -->
+    <div class="charts-grid">
+      <section class="card">
+        <h3>🧩 Taxas e Percentuais (visão macro)</h3>
+        <canvas id="chartPizza"></canvas>
+        <div id="legendMacro" class="chart-legend"></div>
+      </section>
+
+      <section class="card">
+        <h3>📊 Comparativo Geral</h3>
+        <canvas id="chartBarras"></canvas>
+        <div id="legendComp" class="chart-legend"></div>
+      </section>
+
+      <section class="card">
+        <h3>💳 Despesas por Categoria</h3>
+        <canvas id="chartCategorias"></canvas>
+        <div id="legendCategorias" class="chart-legend"></div>
+      </section>
+
+      <section class="card">
+        <h3>🏦 Categorias por Banco</h3>
+        <canvas id="chartBancoCategorias"></canvas>
+        <div id="legendBancoCat" class="chart-legend"></div>
+      </section>
+
+      <section class="card card--wide">
+        <h3>📈 Evolução do Saldo (por mês)</h3>
+        <canvas id="chartSaldoLinha"></canvas>
+        <div id="legendSaldo" class="chart-legend"></div>
+      </section>
+    </div>
+
+    <div class="no-print" style="display:flex; gap:10px; flex-wrap:wrap; margin: 18px 0 40px;">
+      <button class="btn btn--ghost" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Voltar ao topo</button>
+      <button class="btn" type="button" data-action="print">🖨️ Imprimir / Exportar PDF</button>
+    </div>
+  </main>
+
+  <script src="js/core/constants.js"></script>
+  <script src="js/core/core.js"></script>
+  <script src="js/core/config.js"></script>
+  <script src="js/utils/ui.js"></script>
+  <script src="js/sync/sync-service.js"></script>
+  <script src="js/features/charts.js"></script>
+</body>
+</html>

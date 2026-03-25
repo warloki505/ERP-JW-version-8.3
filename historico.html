@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP JW Finance - Histórico</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/core/firebase-init.js"></script>
+</head>
+
+<body>
+  <header class="topbar no-print">
+    <div class="container topbar__row">
+      <h1>📊 ERP JW Finance - Histórico</h1>
+      <div class="topbar__actions">
+        <button onclick="location.href='dashboard.html'" class="btn btn--ghost">← Dashboard</button>
+        <button id="logoutBtn" class="btn btn--ghost">🚪 Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="margin-top: 24px;">
+    
+    <section class="card">
+      <h2>📊 HISTÓRICO DE MESES</h2>
+      <p class="text-muted">Visualize e compare seus dados financeiros ao longo do tempo</p>
+    </section>
+
+    
+    <section class="card">
+      <h2>📤 Exportação por Período</h2>
+      <div class="grid-3" style="align-items:end;">
+        <div class="form-group">
+          <label for="histStart">Mês inicial</label>
+          <input id="histStart" class="input" type="month" />
+        </div>
+        <div class="form-group">
+          <label for="histEnd">Mês final</label>
+          <input id="histEnd" class="input" type="month" />
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+          <button id="btnHistApply" class="btn btn--ghost" type="button">🔄 Atualizar lista</button>
+          <button id="btnHistCSV" class="btn btn--ghost" type="button">📄 Exportar CSV</button>
+          <button class="btn btn--ghost" type="button" onclick="window.print()">🖨️ Exportar PDF</button>
+        </div>
+      </div>
+      <p class="text-muted" style="margin:8px 0 0;">O CSV usa separador <strong>;</strong> e funciona no Excel/Sheets.</p>
+    </section>
+
+    <!-- LISTA DE MESES -->
+    <div id="monthsList">
+      <div class="card" style="text-align: center; padding: 60px;">
+        <p class="text-muted">Carregando histórico...</p>
+      </div>
+    </div>
+
+</main>
+
+  <!-- SCRIPTS -->
+  <script src="js/core/constants.js"></script>
+  <script src="js/core/config.js"></script>
+  <script src="js/core/core.js"></script>
+  <script src="js/utils/ui.js"></script>
+  <script src="js/sync/sync-service.js"></script>
+  <script src="js/features/historico.js"></script>
+
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; }
+      .card { box-shadow: none; border: 1px solid #ddd; }
+    }
+  </style>
+</body>
+</html>

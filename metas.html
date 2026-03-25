@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP JW Finance - Orçamento</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/core/firebase-init.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar__row">
+      <h1>🎯 ERP JW Finance - Orçamento</h1>
+      <div class="topbar__actions">
+        <button class="btn btn--ghost" type="button" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+        <button id="logoutBtn" class="btn btn--ghost" type="button">🚪 Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 18px;">
+    <!-- MODO v8: ORÇAMENTO PERCENTUAL -->
+    <section id="budgetV8" class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <div>
+          <h2 style="margin:0;">📊 Orçamento — <span id="monthLabel">—</span></h2>
+          <p class="text-muted" style="margin:6px 0 0;">
+            Tela comparativa: <strong>onde você quer chegar</strong> (meta em %) vs <strong>onde você está</strong> (realizado).
+          </p>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button id="btnPrevMonth" class="btn btn--ghost" type="button">← Anterior</button>
+          <button id="btnCurrentMonth" class="btn btn--primary" type="button">Mês Atual</button>
+          <button id="btnNextMonth" class="btn btn--ghost" type="button">Próximo →</button>
+        </div>
+      </div>
+
+      <div class="status status--info" id="budgetInfo" style="margin-top: 12px;">
+        Defina percentuais para distribuir sua renda do mês. O total deve somar <strong>100%</strong>.
+      </div>
+
+      <form id="budgetForm" class="form-grid" style="margin-top: 10px;">
+        <div class="form-group">
+          <label for="pctPoupanca">Poupança / Investimentos (%)</label>
+          <input id="pctPoupanca" class="input" type="number" min="0" max="100" step="1" placeholder="Ex.: 20" required />
+        </div>
+
+        <div class="form-group">
+          <label for="pctEssenciais">Despesas Essenciais (%)</label>
+          <input id="pctEssenciais" class="input" type="number" min="0" max="100" step="1" placeholder="Ex.: 50" required />
+        </div>
+
+        <div class="form-group">
+          <label for="pctLivres">Despesas Livres (%)</label>
+          <input id="pctLivres" class="input" type="number" min="0" max="100" step="1" placeholder="Ex.: 20" required />
+        </div>
+
+        <div class="form-group">
+          <label for="pctDividas">Dívidas (quitação / limite) (%)</label>
+          <input id="pctDividas" class="input" type="number" min="0" max="100" step="1" placeholder="Ex.: 10" required />
+        </div>
+
+        <div class="form-group" style="display:flex; gap:10px; align-items:end;">
+          <button class="btn btn--primary" type="submit">Salvar percentuais</button>
+          <button class="btn btn--ghost" type="button" id="btnResetBudget">Restaurar padrão</button>
+        </div>
+      </form>
+
+      <div id="pctTotalBox" class="status status--info" style="margin-top: 12px;">Total: <strong>0%</strong></div>
+
+      <h2 style="margin-top: 18px;">📊 Comparativo do mês</h2>
+
+      <div class="kpi-grid" style="margin-top: 10px;">
+        <div class="kpi kpi--receita">
+          <div class="kpi__title">💵 Receita Base</div>
+          <div class="kpi__value" id="kpiBase">R$ 0,00</div>
+          <small>Base: soma das receitas do mês</small>
+        </div>
+        <div class="kpi kpi--highlight">
+          <div class="kpi__title">🧭 Status geral</div>
+          <div class="kpi__value" id="kpiBudgetStatus">—</div>
+          <small id="kpiBudgetHint">—</small>
+        </div>
+      </div>
+
+      <div id="budgetCards" class="budget-cards" class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 10px;"></div>
+
+      <div class="status status--info" style="margin-top: 14px;">
+        Observação: percentuais não criam lançamentos automaticamente. Eles apenas <strong>orientam</strong> sua distribuição.
+      </div>
+    </section>
+
+
+    <!-- MODO LEGADO (fallback por flag) -->
+    <section id="goalsLegacy" class="card hidden">
+      <h2>🎯 Metas (Modo legado)</h2>
+      <p class="text-muted">Este modo existe apenas como fallback. Se você está vendo isso, a flag v8 está desligada.</p>
+
+      <form id="goalForm" class="form-grid" style="margin-top: 10px;">
+        <div class="form-group">
+          <label>Nome</label>
+          <input id="goalName" class="input" placeholder="Ex.: Reserva de Emergência" required />
+        </div>
+
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="goalType" class="input" required>
+            <option value="poupanca_mes">Poupança do mês</option>
+            <option value="divida_mes">Dívidas do mês (limite)</option>
+            <option value="categoria_mes">Categoria do mês (limite)</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="goalCategoryGroup" style="display:none;">
+          <label>Categoria</label>
+          <input id="goalCategory" class="input" placeholder="Ex.: Streaming e Assinaturas" />
+        </div>
+
+        <div class="form-group">
+          <label>Alvo (R$)</label>
+          <input id="goalTarget" class="input" inputmode="decimal" placeholder="Ex.: 500" required />
+        </div>
+
+        <div class="form-group" style="display:flex; gap:10px; align-items:end;">
+          <button class="btn btn--primary" type="submit">Adicionar</button>
+          <button class="btn btn--ghost" type="button" id="btnResetGoals">Resetar</button>
+        </div>
+      </form>
+
+      <p class="text-muted" style="margin-top:10px;">
+        Regra (legado): metas são avaliadas no <strong>mês em foco</strong> (selected_month ou mês atual).
+      </p>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top: 16px;">
+        <h2 style="margin:0;">📅 <span id="monthLabelLegacy">—</span></h2>
+      </div>
+
+      <div id="goalsList" style="margin-top: 12px;"></div>
+    </section>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="js/core/constants.js"></script>
+  <script src="js/core/config.js"></script>
+  <script src="js/core/core.js"></script>
+  <script src="js/utils/ui.js"></script>
+  <script src="js/sync/sync-service.js"></script>
+  <script src="js/features/metas.js"></script>
+</body>
+</html>

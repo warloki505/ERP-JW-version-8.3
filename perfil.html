@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP JW Finance - Perfil</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/core/firebase-init.js"></script>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container topbar__row">
+      <h1>⚙️ ERP JW Finance - Perfil</h1>
+      <div class="topbar__actions">
+        <button onclick="location.href='dashboard.html'" class="btn btn--ghost">← Dashboard</button>
+        <button id="logoutBtn" class="btn btn--ghost">🚪 Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 980px; margin-top: 24px;">
+
+    <!-- INFORMAÇÕES DO USUÁRIO -->
+    <section class="card">
+      <h2>👤 Informações do usuário</h2>
+      <div class="form">
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" id="displayNome" readonly class="input--readonly" />
+        </div>
+
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="displayEmail" readonly class="input--readonly" />
+        </div>
+
+        <div class="form-group">
+          <label>Conta criada em</label>
+          <input type="text" id="displayDataCriacao" readonly class="input--readonly" />
+        </div>
+      </div>
+    </section>
+
+    <!-- SEGURANÇA -->
+    <section class="card">
+      <h2>🔐 Segurança</h2>
+      <p class="text-muted" style="margin-top: 0;">
+        Altere sua senha com confirmação. Isso não mexe em nenhum dado financeiro.
+      </p>
+
+      <form id="formChangePassword" class="form">
+        <div class="form-group">
+          <label for="currentPassword">Senha atual</label>
+          <input type="password" id="currentPassword" autocomplete="current-password" required />
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword">Nova senha</label>
+          <input type="password" id="newPassword" autocomplete="new-password" minlength="6" required />
+          <small class="text-muted">Mínimo 6 caracteres</small>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirmar nova senha</label>
+          <input type="password" id="confirmPassword" autocomplete="new-password" minlength="6" required />
+        </div>
+
+        <button class="btn btn--primary" type="submit" style="width: 100%;">Atualizar senha</button>
+      </form>
+
+      <div id="pwStatus" class="status hidden"></div>
+    </section>
+
+    <!-- BACKUP / EXPORTAÇÃO -->
+    <section class="card" style="margin-top: 20px;">
+      <h2>🧰 Backup e Exportação</h2>
+      <p class="text-muted">Recomendado: exporte um backup (JSON) antes de limpar cache do navegador ou trocar de PC.</p>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 10px;">
+        <button id="btnExportBackup" class="btn btn--primary">⬇️ Exportar Backup (JSON)</button>
+        <button id="btnImportBackup" class="btn btn--ghost">⬆️ Importar Backup (JSON)</button>
+        <button id="btnExportCSV" class="btn btn--ghost">📄 Exportar CSV do mês</button>
+
+        
+      </div>
+
+      <input type="file" id="backupFileInput" accept="application/json" class="hidden" />
+    </section>
+
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="js/core/constants.js"></script>
+  <script src="js/core/config.js"></script>
+  <script src="js/core/core.js"></script>
+  <script src="js/utils/ui.js"></script>
+  <script src="js/sync/sync-service.js"></script>
+  <script src="js/features/perfil.js"></script>
+</body>
+</html>

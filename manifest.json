@@ -1,0 +1,9 @@
+{
+  "name": "ERP JW Finance",
+  "short_name": "JW Finance",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
+  "icons": []
+}

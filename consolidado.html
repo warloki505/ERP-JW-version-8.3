@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP JW Finance - Consolidado</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/core/firebase-init.js"></script>
+  
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar__row">
+      <h1>🧾 ERP JW Finance - Consolidado</h1>
+      <div class="topbar__actions">
+        <button class="btn btn--ghost" type="button" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+        <button id="logoutBtn" class="btn btn--ghost" type="button">🚪 Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 18px;">
+
+    <section class="card no-print">
+      <h2>📅 Filtro por período</h2>
+      <div class="grid-4" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+        <div class="form-group">
+          <label for="consStart">Mês inicial</label>
+          <input id="consStart" class="input" type="month" />
+        </div>
+        <div class="form-group">
+          <label for="consEnd">Mês final</label>
+          <input id="consEnd" class="input" type="month" />
+        </div>
+        <div class="form-group" style="align-self:end;">
+          <button id="btnApply" class="btn btn--primary" type="button" style="width:100%;">Aplicar</button>
+        </div>
+        <div class="form-group" style="align-self:end;">
+          <button id="btnClearFilter" class="btn btn--ghost" type="button" style="width:100%;">Limpar filtro</button>
+        </div>
+      </div>
+      <p class="text-muted" style="margin:10px 0 0;">O consolidado será calculado com base no período selecionado.</p>
+    </section>
+
+    <section class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+        <div>
+          <h2 style="margin:0;">📅 <span id="monthLabel">—</span></h2>
+          <p class="text-muted" style="margin:6px 0 0;">Leitura rápida: liquidez, orçamento e consolidações úteis.</p>
+        </div>
+        <div class="status status--info" id="scoreBox">Score: —</div>
+        <div class="no-print" style="display:flex; gap:10px;">
+          <button id="btnConsCSV" class="btn btn--ghost" type="button">📄 Exportar CSV</button>
+          <button class="btn btn--ghost" type="button" onclick="window.print()">🖨️ Exportar PDF</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid" style="margin-top: 14px;">
+        <div class="kpi kpi--saldo">
+          <div class="kpi__title">💧 Liquidez (Saldo)</div>
+          <div class="kpi__value" id="kpiLiquidez">R$ 0,00</div>
+          <small>Renda - (Poupança + Essenciais + Livres + Dívidas)</small>
+        </div>
+
+        <div class="kpi kpi--receita">
+          <div class="kpi__title">💵 Renda</div>
+          <div class="kpi__value" id="kpiRenda">R$ 0,00</div>
+        </div>
+
+        <div class="kpi kpi--poupanca">
+          <div class="kpi__title">🏦 Poupança</div>
+          <div class="kpi__value" id="kpiPoupanca">R$ 0,00</div>
+        </div>
+
+        <div class="kpi kpi--despesa">
+          <div class="kpi__title">📌 OPEX Essencial</div>
+          <div class="kpi__value" id="kpiEssenciais">R$ 0,00</div>
+        </div>
+
+        <div class="kpi kpi--livre">
+          <div class="kpi__title">🎯 OPEX Discricionário</div>
+          <div class="kpi__value" id="kpiLivres">R$ 0,00</div>
+        </div>
+
+        <div class="kpi kpi--dividas">
+          <div class="kpi__title">⚠️ Dívidas</div>
+          <div class="kpi__value" id="kpiDividas">R$ 0,00</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top: 16px;">
+      <h2>🏦 Saldo por Banco / Instituição</h2>
+      <div id="byBankBalance" class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-top: 10px;"></div>
+      <p class="text-muted" style="margin-top: 10px;">Soma entradas e saídas por banco: Receita + Poupança − Despesas − Dívidas (no período selecionado).</p>
+    </section>
+
+    <section class="card" style="margin-top: 16px;">
+      <h2>🚦 Saúde Financeira</h2>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
+        <span id="healthPoupanca" class="status status--info">Poupança: —</span>
+        <span id="healthEndividamento" class="status status--info">Endividamento: —</span>
+        <span id="healthEssenciais" class="status status--info">Essenciais: —</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="js/core/constants.js"></script>
+  <script src="js/core/config.js"></script>
+  <script src="js/core/core.js"></script>
+  <script src="js/utils/ui.js"></script>
+  <script src="js/sync/sync-service.js"></script>
+  <script src="js/features/consolidado.js"></script>
+</body>
+</html>
