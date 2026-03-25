@@ -1,0 +1,203 @@
+================================================================================
+VALIDAÇÃO — ERP JW Finance v8.3.0
+Fase 3: Sincronização Multi-Device
+Data: 2026-03-22
+Instrução: marcar [x] após validar cada item. Não fazer release sem 100% marcado.
+================================================================================
+
+--------------------------------------------------------------------------------
+BLOCO 1 — AUTENTICAÇÃO E SESSÃO
+--------------------------------------------------------------------------------
+[ ] 1.1  Login com e-mail/senha válidos redireciona para dashboard.html
+[ ] 1.2  Cadastro de novo usuário cria conta e faz login automaticamente
+[ ] 1.3  Logout limpa sessão sem apagar dados do localStorage
+[ ] 1.4  Ao reabrir o app com sessão ativa, login é automático (sem digitar senha)
+[ ] 1.5  Modo offline sem sessão Firebase: app abre normalmente em modo local
+
+--------------------------------------------------------------------------------
+BLOCO 2 — CORE LOCAL (REGRESSÃO — não deve ter mudado nada)
+--------------------------------------------------------------------------------
+[ ] 2.1  Troca de mês (Anterior / Atual / Próximo) atualiza KPIs e tabela
+[ ] 2.2  Input de data rejeita datas fora do mês ativo
+[ ] 2.3  Select de categoria/banco não exibe "Selecione" após escolha
+[ ] 2.4  Lançamento de Receita salva e aparece na tabela
+[ ] 2.5  Lançamento de Poupança salva e aparece na tabela
+[ ] 2.6  Lançamento de Despesa Essencial salva e aparece na tabela
+[ ] 2.7  Lançamento de Despesa Livre salva e aparece na tabela
+[ ] 2.8  Lançamento de Dívida salva e aparece na tabela
+[ ] 2.9  Edição de lançamento salva corretamente (valor, data, categoria, banco)
+[ ] 2.10 Score do mês exibido como pill com tonalidade correta (ok/warn/error)
+[ ] 2.11 Score exibe "—" quando não há receita no mês
+[ ] 2.12 Fixar lançamento (recorrência) aplica corretamente no mês seguinte
+[ ] 2.13 Gráfico "Evolução do Saldo" respeita o filtro de período selecionado
+[ ] 2.14 Tela de Metas: percentuais salvam e carregam por mês
+[ ] 2.15 Backup JSON exporta sem erros e abre corretamente
+
+--------------------------------------------------------------------------------
+BLOCO 3 — SOFT DELETE
+--------------------------------------------------------------------------------
+[ ] 3.1  Excluir lançamento: item desaparece da tabela imediatamente
+[ ] 3.2  Após excluir, fazer reload da página: item NÃO reaparece
+[ ] 3.3  Excluir lançamento: campo deletedAt preenchido no localStorage (inspecionar)
+[ ] 3.4  Excluir lançamento: campo updatedAt atualizado junto com deletedAt
+[ ] 3.5  Histórico NÃO exibe transações com deletedAt preenchido
+[ ] 3.6  Gráficos NÃO incluem transações com deletedAt nos cálculos
+[ ] 3.7  Consolidado NÃO exibe transações com deletedAt nos totais
+[ ] 3.8  Metas NÃO considera transações com deletedAt no realizado
+
+--------------------------------------------------------------------------------
+BLOCO 4 — INDICADOR DE STATUS DE SYNC
+--------------------------------------------------------------------------------
+[ ] 4.1  Badge "Sync: —" aparece na topbar ao carregar qualquer tela
+[ ] 4.2  Ao fazer login com Firebase válido e online: badge muda para "Sync: OK"
+[ ] 4.3  Ao criar lançamento online: badge mostra "Sync: pendente" e depois "Sync: OK"
+[ ] 4.4  Ao desconectar a rede: badge muda para "Sync: offline"
+[ ] 4.5  Ao reconectar a rede: badge dispara flush e volta para "Sync: OK"
+[ ] 4.6  Com feature flag desabilitada: badge mostra "Sync: desabilitado"
+
+--------------------------------------------------------------------------------
+BLOCO 5 — SINCRONIZAÇÃO MULTI-DEVICE (requer dois dispositivos ou abas distintas)
+--------------------------------------------------------------------------------
+[ ] 5.1  Criar 3 lançamentos no Device A (online): aparecem no Device B em até 10s
+[ ] 5.2  Editar lançamento no Device A: edição chega ao Device B em até 10s
+[ ] 5.3  Excluir lançamento no Device A: exclusão chega ao Device B em até 10s
+         (Device B não deve "ressuscitar" o registro excluído)
+
+[ ] 5.4  CONFLITO — Last Write Wins:
+         a. Colocar Device B offline
+         b. Editar TX-001 no Device A às 10:00 → sync imediato
+         c. Editar TX-001 no Device B às 10:03 (offline) → fica na fila
+         d. Reconectar Device B → versão de Device B (10:03) deve prevalecer em ambos
+
+[ ] 5.5  RESSURREIÇÃO — Soft delete cross-device:
+         a. Excluir lançamento no Device A → sync imediato
+         b. Device B fica offline com o dado ainda vivo
+         c. Reconectar Device B → registro NÃO deve reaparecer
+
+[ ] 5.6  Salvar categorias em Gerenciadores no Device A: chega ao Device B em até 10s
+[ ] 5.7  Salvar bancos em Gerenciadores no Device A: chega ao Device B em até 10s
+[ ] 5.8  Alterar meta/orçamento no Device A: chega ao Device B em até 10s
+
+--------------------------------------------------------------------------------
+BLOCO 6 — BOOTSTRAP DE NOVO DISPOSITIVO
+--------------------------------------------------------------------------------
+[ ] 6.1  Limpar localStorage do Device B (ou usar aba anônima)
+[ ] 6.2  Fazer login com mesma conta do Device A
+[ ] 6.3  Transações do Device A aparecem no Device B em até 30s
+[ ] 6.4  Categorias e bancos customizados do Device A aparecem no Device B
+[ ] 6.5  Metas/orçamento do Device A aparecem no Device B
+[ ] 6.6  Perfil do usuário reconstruído corretamente no Device B
+[ ] 6.7  Badge de sync mostra "Sync: OK" após bootstrap concluído
+
+--------------------------------------------------------------------------------
+BLOCO 7 — MODO OFFLINE E FILA LOCAL
+--------------------------------------------------------------------------------
+[ ] 7.1  Desconectar rede → criar lançamento → badge mostra "Sync: offline"
+[ ] 7.2  Lançamento criado offline existe no localStorage (dados não perdidos)
+[ ] 7.3  Reconectar rede → fila processa → badge muda para "Sync: OK"
+[ ] 7.4  Lançamento criado offline aparece no segundo dispositivo após sync
+[ ] 7.5  Inspecionar gf_erp_syncQueue_<userId>: itens criados offline
+         ficam com status "pending" e mudam para "synced" ao reconectar
+
+--------------------------------------------------------------------------------
+BLOCO 8 — GERENCIADORES E PERFIL (integração de sync corrigida)
+--------------------------------------------------------------------------------
+[ ] 8.1  Salvar categorias: badge muda para "Sync: pendente" e depois "Sync: OK"
+[ ] 8.2  Salvar bancos: badge muda para "Sync: pendente" e depois "Sync: OK"
+[ ] 8.3  Restaurar backup JSON: badge dispara sync das keys restauradas
+[ ] 8.4  Após restore de backup, dados aparecem no segundo dispositivo
+
+--------------------------------------------------------------------------------
+BLOCO 9 — FEATURE FLAG
+--------------------------------------------------------------------------------
+[ ] 9.1  Definir gf_erp_sync_feature_enabled = '0' no localStorage
+[ ] 9.2  Recarregar qualquer tela: badge mostra "Sync: desabilitado"
+[ ] 9.3  CRUD de lançamentos continua funcionando normalmente (modo local)
+[ ] 9.4  Nenhuma chamada ao Firestore é feita (verificar Network DevTools)
+[ ] 9.5  Remover a flag (ou definir como '1'): sync volta a funcionar
+
+--------------------------------------------------------------------------------
+BLOCO 10 — PWA E SERVICE WORKER
+--------------------------------------------------------------------------------
+[ ] 10.1 CACHE_NAME em sw.js está em 'erp-jw-finance-v8.3.0'
+[ ] 10.2 js/sync/sync-service.js está no array ASSETS do sw.js
+[ ] 10.3 Após primeiro carregamento online, desconectar rede e recarregar:
+         app abre normalmente em modo offline
+[ ] 10.4 SyncService carrega e inicializa corretamente em modo offline
+         (badge aparece, sem erros no console)
+
+================================================================================
+TESTES MANUAIS RECOMENDADOS (cenários críticos de ponta a ponta)
+================================================================================
+
+TESTE A — Ciclo completo online
+  1. Logar no Device A e Device B com a mesma conta
+  2. No Device A: criar receita R$1.000, despesa R$300, excluir a despesa
+  3. Aguardar até 10s
+  4. No Device B: verificar que receita aparece, despesa NÃO aparece
+  5. KPIs de ambos os devices devem estar idênticos
+
+TESTE B — Conflito de edição simultânea
+  1. Device B: colocar offline
+  2. Device A: editar TX-001, descrição = "Versão A", salvar (sync imediato)
+  3. Device B (offline): editar TX-001, descrição = "Versão B", salvar (fica na fila)
+     *** Device B deve ter updatedAt POSTERIOR ao Device A ***
+  4. Device B: reconectar
+  5. Resultado esperado: TX-001 com descrição "Versão B" em ambos os devices
+
+TESTE C — Ressurreição de dado excluído
+  1. Device B: colocar offline
+  2. Device A: excluir TX-002, aguardar sync
+  3. Device B (offline): TX-002 ainda aparece (ainda não recebeu o delete)
+  4. Device B: reconectar
+  5. Resultado esperado: TX-002 desaparece do Device B (soft delete prevalece)
+
+TESTE D — Bootstrap completo
+  1. Device B: abrir aba anônima (localStorage vazio)
+  2. Logar com a mesma conta do Device A
+  3. Aguardar bootstrap (badge: "Executando bootstrap..." → "Sync: OK")
+  4. Verificar: transações, categorias, bancos e metas idênticos ao Device A
+
+TESTE E — Restore de backup cross-device
+  1. Device A: exportar backup JSON
+  2. Device B (aba anônima): logar, localStorage vazio
+  3. Device A: importar backup JSON em Perfil
+  4. Aguardar sync
+  5. Device B: dados do backup devem aparecer sem ação manual
+
+================================================================================
+RESULTADO FINAL
+================================================================================
+Data da validação: ____/____/______
+Validado por: _______________________
+Versão testada: 8.3.0
+Ambiente: ___________________________
+Resultado: [ ] APROVADO  [ ] REPROVADO
+Observações:
+
+
+================================================================================
+
+================================================================================
+BLOCO 11 — VALIDAÇÃO DOS AJUSTES FINAIS (patch 3)
+================================================================================
+
+--- Ajuste 1: failed não mascarado como synced ---
+[ ] 11.1 Simular falha definitiva: desabilitar Firestore (project suspenso ou token inválido)
+[ ] 11.2 Criar um lançamento → fila tenta sync → falha 5x (maxRetries)
+[ ] 11.3 Item muda para status 'failed' na fila (inspecionar gf_erp_syncQueue_<userId>)
+[ ] 11.4 Badge deve mostrar "Sync: erro" — NÃO "Sync: OK"
+[ ] 11.5 Recarregar página com item failed na fila: badge continua mostrando "Sync: erro"
+[ ] 11.6 Ao restaurar conexão e corrigir token: item failed é mantido como failed
+         (não volta para pending automaticamente — comportamento correto)
+
+--- Ajuste 2: updateIndicator() conta failed ---
+[ ] 11.7 Com item failed na fila, badge exibe "Sync: erro (N)" onde N inclui failed
+[ ] 11.8 Com item error (retry ainda possível) + item failed: badge mostra soma correta
+
+--- Ajuste 3: recorrApplied como objeto ---
+[ ] 11.9  Fixar lançamento recorrente em 3 meses futuros
+[ ] 11.10 Excluir recorrência via "Excluir futuros" no mês atual
+[ ] 11.11 Nos meses futuros: lançamento não reaparece após reload
+[ ] 11.12 Inspecionar gf_erp_recorr_applied_<userId>_<monthId>:
+          chave do recurrenceId deve ter sido removida do objeto mapa
