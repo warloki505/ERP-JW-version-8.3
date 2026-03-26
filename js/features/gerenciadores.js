@@ -13,24 +13,18 @@
 
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) logoutBtn.addEventListener('click', async () => {
-      if (!confirm('Deseja realmente sair?')) return;
+  if (!(await Core.ui.confirm('Deseja realmente sair?', 'Confirmar'))) return;
 
-      try {
-        await window.firebaseApi?.signOut?.();
-      } catch (e) {
-        console.warn('[Logout] Falha ao encerrar sessão Firebase:', e);
-      }
+  try {
+    await window.firebaseApi?.signOut?.();
+  } catch (e) {
+    console.warn('[Logout] Falha ao encerrar sessão Firebase:', e);
+  }
 
-      localStorage.removeItem('gf_erp_firebase_rest_session');
-      localStorage.removeItem('gf_erp_logged');
-      localStorage.removeItem('gf_erp_current_userId');
-
-      if (window.Core?.user?.clearSession) {
-        Core.user.clearSession();
-      }
-
-      window.location.replace('index.html');
-    });
+  localStorage.removeItem('gf_erp_firebase_rest_session');
+  Core.user.clearSession();
+  window.location.replace('index.html');
+});
 const catGrupo = document.getElementById('catGrupo');
     const bankTipo = document.getElementById('bankTipo');
 
