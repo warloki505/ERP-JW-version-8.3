@@ -1,5 +1,5 @@
 /* =====================================================
-   ERP JW Finance v8.2.1 - DASHBOARD (MULTIUSUÁRIO)
+   ERP FINANCEIRO JW v5.1 - DASHBOARD (MULTIUSUÁRIO)
    - CRUD + navegação de meses + modais + recorrências
    - Cálculo centralizado no Core.calc.summary
    - selected_month consistente por usuário
@@ -22,7 +22,6 @@
     }
 
     if (!Core.guards.requireLogin()) return;
-    try { await window.SyncService?.start(Core.user.getCurrentUserId()); } catch (err) { console.warn('[Dashboard] SyncService indisponível:', err); }
 
     // garantir configs (por usuário)
     ERP_CFG.ensureCategoriesConfig();
@@ -36,65 +35,17 @@
   function uid() {
     return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
   }
+
   function setOptions(select, list) {
     if (!select) return;
-
-    // preserva seleção atual (se existir)
-    const current = String(select.value ?? "");
-
-    // Regra UX (v8.2.1): placeholder "Selecione" apenas quando NÃO há valor selecionado.
-    // Evita duplicação/mistura do placeholder após o usuário já ter escolhido.
-    const showPlaceholder = !current;
-
-    // normaliza lista (remove vazios e o próprio placeholder, se vier por engano)
-    const clean = (list || []).filter((item) => {
-      if (item === null || item === undefined) return false;
-      if (typeof item === "string") {
-        const s = String(item).trim();
-        if (!s) return false;
-        if (s.toLowerCase() === "selecione") return false;
-        return true;
-      }
-      if (item && typeof item === "object") {
-        const v = String(item.value ?? "").trim();
-        const lab = String(item.label ?? item.value ?? "").trim();
-        if (!v && !lab) return false;
-        if (!v && lab.toLowerCase() === "selecione") return false;
-        return true;
-      }
-      return true;
-    });
-
-    select.innerHTML = "";
-
-    if (showPlaceholder) {
-      const opt0 = document.createElement("option");
-      opt0.value = "";
-      opt0.textContent = "Selecione";
-      select.appendChild(opt0);
-    }
-
-    clean.forEach((item) => {
-      const opt = document.createElement("option");
-      if (typeof item === "string") {
-        opt.value = item;
-        opt.textContent = item;
-      } else if (item && typeof item === "object") {
-        opt.value = String(item.value ?? "");
-        opt.textContent = String(item.label ?? item.value ?? "");
-        if (item.data && typeof item.data === "object") {
-          Object.entries(item.data).forEach(([k, v]) => { opt.dataset[k] = String(v); });
-        }
-      }
+    select.innerHTML = `<option value="">Selecione</option>`;
+    (list || []).forEach((item) => {
+      const opt = document.createElement('option');
+      opt.value = item;
+      opt.textContent = item;
       select.appendChild(opt);
     });
-
-    if (current) {
-      ensureSelectedOption(select, current);
-      select.value = current;
-    }
   }
-
 
   function ensureSelectedOption(select, value) {
     if (!select) return;
@@ -133,9 +84,7 @@
   }
 
   function saveTx(list, monthId = activeMonth) {
-    const ok = Core.storage.setJSON(getTxKey(monthId), Array.isArray(list) ? list : []);
-    try { window.SyncService?.markDirty?.('tx-save'); } catch {}
-    return ok;
+    return Core.storage.setJSON(getTxKey(monthId), Array.isArray(list) ? list : []);
   }
 
   let tx = [];
@@ -187,7 +136,8 @@
       const day = Core.month.clampDay(monthId, t.day || 1);
       const data = `${monthId}-${day}`;
 
-      monthTx.push(buildTxRecord({
+      monthTx.push({
+        id: uid(),
         tipo: t.tipo,
         subtipo: t.subtipo || undefined,
         data,
@@ -197,7 +147,7 @@
         descricao: t.descricao || '',
         auto: true,
         recurrenceId: rec.id
-      }, monthId));
+      });
 
       markAppliedThisMonth(monthId, rec.id);
       changed = true;
@@ -235,55 +185,7 @@
     return ERP_CFG.getActiveBankLabels(type);
   }
 
-  
-  function buildExpenseOptions() {
-    // une Essencial + Livre em um único select
-    // Importante: manter compatibilidade com lançamentos legados (categoria como texto/label)
-    const norm = (c) => {
-      if (!c) return null;
-      if (typeof c === 'string') return { id: ERP_CFG.normalizeLabel(c), label: c, active: true };
-      if (typeof c === 'object') {
-        return {
-          id: String(c.id || ERP_CFG.normalizeLabel(c.label || c.originalLabel || '') || ''),
-          label: String(c.label || c.originalLabel || ''),
-          originalLabel: c.originalLabel ? String(c.originalLabel) : undefined,
-          active: c.active !== false
-        };
-      }
-      return null;
-    };
-
-    const essRaw = (ERP_CFG.getCategoryConfig?.('despesa_essencial') || []);
-    const livRaw = (ERP_CFG.getCategoryConfig?.('despesa_livre') || []);
-
-    const ess = essRaw.map(norm).filter((c) => c && c.active && c.label)
-      .map((c) => ({ value: c.id, label: c.label, data: { subtipo: 'essencial', kind: 'despesa_essencial', id: c.id } }));
-
-    const liv = livRaw.map(norm).filter((c) => c && c.active && c.label)
-      .map((c) => ({ value: c.id, label: c.label, data: { subtipo: 'livre', kind: 'despesa_livre', id: c.id } }));
-
-    return [...ess, ...liv];
-  }
-
-  function syncDespesaTipoFromCategoria() {
-    if (!despesaCategoria || !despesaSubtipo) return;
-    const override = document.getElementById('overrideDespesaTipo');
-    const opt = despesaCategoria.selectedOptions?.[0] || null;
-    const subtipo = opt?.dataset?.subtipo || '';
-    const allowAuto = !!subtipo;
-    const isOverride = !!override?.checked;
-
-    if (allowAuto && !isOverride) {
-      despesaSubtipo.value = subtipo;
-      despesaSubtipo.disabled = true;
-    } else {
-      // fallback: permite manual
-      despesaSubtipo.disabled = false;
-      if (!despesaSubtipo.value) despesaSubtipo.value = '';
-    }
-  }
-
-// -------------------------------
+  // -------------------------------
   // UI ELEMENTS
   // -------------------------------
   const kpiRenda = $('kpiRenda');
@@ -303,10 +205,8 @@
   const btnCharts = $('btnCharts');
   const btnConsolidado = $('btnConsolidado');
   const btnMetas = $('btnMetas');
-  const btnGerenciadores = $('btnGerenciadores');
 
   const btnLimparMes = $('btnLimparMes');
-  const btnExportCSVMonth = $('btnExportCSVMonth');
   const logoutBtn = $('logoutBtn');
 
   const tbody = $('txTbody');
@@ -322,14 +222,17 @@
   const modalEdit = $('modalEdit');
   const modalFixar = $('modalFixar');
 
-  // v8.2.3: Dashboard minimalista — manter apenas Score do mês
+  // Saúde (se existir no HTML)
+  const healthPoup = $('healthPoupanca');
+  const healthEnd = $('healthEndividamento');
+  const healthEss = $('healthEssenciais');
   const healthScore = $('healthScore');
 
   function toneClass(tone) {
-    if (tone === 'ok') return 'score-pill--ok';
-    if (tone === 'warn') return 'score-pill--warn';
-    if (tone === 'error') return 'score-pill--error';
-    return 'score-pill--neutral';
+    if (tone === 'ok') return 'status--ok';
+    if (tone === 'warn') return 'status--info';
+    if (tone === 'error') return 'status--error';
+    return 'status--info';
   }
 
   // -------------------------------
@@ -338,8 +241,7 @@
   function render() {
     if (monthLabel) monthLabel.textContent = Core.month.getMonthLabel(activeMonth);
 
-    const txVisible = window.SyncService?.visibleTx ? SyncService.visibleTx(tx) : (tx || []).filter((t) => !t?.deletedAt);
-    const sum = Core.calc.summary(txVisible);
+    const sum = Core.calc.summary(tx);
 
     if (kpiRenda) kpiRenda.textContent = Core.format.brl(sum.renda);
     if (kpiPoupanca) kpiPoupanca.textContent = Core.format.brl(sum.poupanca);
@@ -354,25 +256,34 @@
       else kpiSaldo.style.color = '';
     }
 
-    // Score do mês (v8.2.3 - UI minimalista / Apple)
-    if (window.ERP_CONST?.thresholds && healthScore) {
-      const thresholds = window.ERP_CONST.thresholds;
-      const rendaBase = sum.renda || 0;
-      const score = Core.calc.score(sum, thresholds, { poupanca: 40, endividamento: 30, essenciais: 30 });
+    // Saúde/score
+    if (window.ERP_CONST?.thresholds) {
+      const health = Core.calc.health(sum, ERP_CONST.thresholds);
+      const score = Core.calc.score(sum, ERP_CONST.thresholds, { poupanca: 40, endividamento: 30, essenciais: 30 });
 
-      const tone = rendaBase <= 0 ? 'neutral' : (score == null ? 'neutral' : score >= 80 ? 'ok' : score >= 60 ? 'warn' : 'error');
-      healthScore.className = `score-pill ${toneClass(tone)}`;
-      healthScore.textContent = rendaBase <= 0
-        ? 'Score do mês: —'
-        : `Score do mês: ${score == null ? '—' : `${score}/100`}`;
+      if (healthPoup) {
+        healthPoup.className = `status ${toneClass(health.poupanca.tone)}`;
+        healthPoup.textContent = `Poupança: ${health.poupanca.status} ${health.poupanca.rate == null ? '' : `(${health.poupanca.rate.toFixed(1)}%)`}`;
+      }
+      if (healthEnd) {
+        healthEnd.className = `status ${toneClass(health.endividamento.tone)}`;
+        healthEnd.textContent = `Endividamento: ${health.endividamento.status} ${health.endividamento.rate == null ? '' : `(${health.endividamento.rate.toFixed(1)}%)`}`;
+      }
+      if (healthEss) {
+        healthEss.className = `status ${toneClass(health.essenciais.tone)}`;
+        healthEss.textContent = `Essenciais: ${health.essenciais.status} ${health.essenciais.rate == null ? '' : `(${health.essenciais.rate.toFixed(1)}%)`}`;
+      }
+      if (healthScore) {
+        healthScore.className = `status ${score == null ? 'status--info' : (score >= 80 ? 'status--ok' : score >= 60 ? 'status--info' : 'status--error')}`;
+        healthScore.textContent = `Score do mês: ${score == null ? '—' : `${score}/100`}`;
+      }
     }
-
 
     // Tabela
     if (!tbody) return;
 
     tbody.innerHTML = '';
-    if (txVisible.length === 0) {
+    if (tx.length === 0) {
       tbody.innerHTML = `
         <tr>
           <td colspan="7" style="text-align: center; padding: 40px;">
@@ -383,7 +294,7 @@
       return;
     }
 
-    txVisible.slice().sort((a, b) => String(b.data).localeCompare(String(a.data))).forEach((t) => {
+    tx.slice().sort((a, b) => String(b.data).localeCompare(String(a.data))).forEach((t) => {
       const tr = document.createElement('tr');
 
       let badgeClass = 'badge-receita';
@@ -415,37 +326,8 @@
     });
   }
 
-  function buildTxRecord(data, monthId = activeMonth, existing = null) {
-    const now = new Date().toISOString();
-    const base = { ...(existing || {}) };
-    return {
-      ...base,
-      ...data,
-      id: base.id || data.id || uid(),
-      userId: userId(),
-      monthId,
-      createdAt: base.createdAt || now,
-      updatedAt: now,
-      deletedAt: (data.deletedAt !== undefined) ? data.deletedAt : (base.deletedAt || null),
-      deviceId: window.SyncService?.getDeviceId?.() || base.deviceId || 'local-device',
-      schemaVersion: window.SyncService?.TX_SCHEMA_VERSION || base.schemaVersion || 1
-    };
-  }
-
   function addTx(data) {
-    const d = { ...data };
-
-    // compat: sempre manter label (categoria/banco). Para novos lançamentos, registrar *_Id quando existir.
-    try {
-      if (d.tipo === 'despesa' && d.categoriaId && !d.categoria) {
-        const kind = (d.subtipo === 'essencial') ? 'despesa_essencial' : (d.subtipo === 'livre') ? 'despesa_livre' : 'despesa_essencial';
-        const r = Core.resolve.category(userId(), kind, d.categoriaId, d.categoria);
-        d.categoriaId = r.id;
-        d.categoria = r.label;
-      }
-    } catch {}
-
-    tx.push(buildTxRecord(d));
+    tx.push({ id: uid(), ...data });
     saveTx(tx);
     render();
   }
@@ -469,10 +351,6 @@
     if (!item) return;
 
     editingId = id;
-
-    const resumo = `${(item.tipo||"").toUpperCase()} • ${Core.format.brl(item.valor)} • ${item.categoria || "—"} • ${item.banco || "—"}`;
-    const box = $('editResumo');
-    if (box) box.textContent = resumo;
 
     $('editId').value = id;
     $('editTipo').value = item.tipo;
@@ -519,12 +397,6 @@
     item.categoria = $('editCategoria').value;
     item.banco = $('editBanco').value;
     item.descricao = $('editDescricao').value.trim();
-    item.monthId = activeMonth;
-    item.userId = userId();
-    item.updatedAt = new Date().toISOString();
-    item.deviceId = window.SyncService?.getDeviceId?.() || item.deviceId || 'local-device';
-    item.schemaVersion = window.SyncService?.TX_SCHEMA_VERSION || item.schemaVersion || 1;
-    item.deletedAt = null;
 
     saveTx(tx);
     render();
@@ -535,99 +407,15 @@
   // -------------------------------
   // DELETE
   // -------------------------------
-  async function deleteTx(id) {
-    const item = tx.find((t) => t.id === id);
-    if (!item) return;
-
-    // Recorrente: escolher escopo
-    if (item.recurrenceId) {
-      const choice = prompt(
-        `Lançamento fixado (recorrência) detectado.\n\n1) Excluir apenas este mês\n2) Excluir este mês e futuros\n3) Cancelar\n\nDigite 1, 2 ou 3:`
-      );
-
-      if (!choice || choice === '3') return;
-
-      if (choice === '1') {
-        if (!(await Core.ui.confirm('Confirmar exclusão APENAS deste mês?', 'Confirmar'))) return;
-        const target = tx.find((t) => t.id === id);
-        if (target) {
-          target.deletedAt = new Date().toISOString();
-          target.updatedAt = target.deletedAt;
-          target.deviceId = window.SyncService?.getDeviceId?.() || target.deviceId || 'local-device';
-          target.schemaVersion = window.SyncService?.TX_SCHEMA_VERSION || target.schemaVersion || 1;
-        }
-        saveTx(tx);
-        render();
-        ERP.toast('✓ Lançamento removido (somente este mês).', 'info');
-        return;
-      }
-
-      if (choice === '2') {
-        if (!confirm('Confirmar exclusão deste mês e de TODOS os futuros? (Meses passados não serão alterados)')) return;
-        deleteFutureRecurring(item.recurrenceId, activeMonth);
-        // remove também do mês atual
-        const target = tx.find((t) => t.id === id);
-        if (target) {
-          target.deletedAt = new Date().toISOString();
-          target.updatedAt = target.deletedAt;
-          target.deviceId = window.SyncService?.getDeviceId?.() || target.deviceId || 'local-device';
-          target.schemaVersion = window.SyncService?.TX_SCHEMA_VERSION || target.schemaVersion || 1;
-        }
-        saveTx(tx);
-        render();
-        ERP.toast('✓ Recorrência removida (mês atual e futuros).', 'info');
-        return;
-      }
-
-      return;
-    }
-
-    if (!(await Core.ui.confirm('⚠️ Confirmar exclusão deste lançamento?', 'Confirmar'))) return;
-    item.deletedAt = new Date().toISOString();
-    item.updatedAt = item.deletedAt;
-    item.deviceId = window.SyncService?.getDeviceId?.() || item.deviceId || 'local-device';
-    item.schemaVersion = window.SyncService?.TX_SCHEMA_VERSION || item.schemaVersion || 1;
+  function deleteTx(id) {
+    if (!confirm('⚠️ Confirmar exclusão deste lançamento?')) return;
+    tx = tx.filter((t) => t.id !== id);
     saveTx(tx);
     render();
     ERP.toast('✓ Lançamento removido!', 'info');
   }
 
-  function deleteFutureRecurring(recurrenceId, fromMonthId) {
-    // Nunca alterar meses passados
-    const months = Core.period.listMonthIds(userId());
-    months.filter((m) => m >= fromMonthId).forEach((m) => {
-      const list = Core.tx.load(userId(), m) || [];
-      let changed = false;
-      const next = list.map((t) => {
-        if (t?.recurrenceId !== recurrenceId || t?.deletedAt) return t;
-        changed = true;
-        return {
-          ...t,
-          deletedAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          deviceId: window.SyncService?.getDeviceId?.() || t.deviceId || 'local-device',
-          schemaVersion: window.SyncService?.TX_SCHEMA_VERSION || t.schemaVersion || 1
-        };
-      });
-      if (changed) Core.tx.save(userId(), m, next);
-
-      // limpeza do marcador "applied" (objeto mapa, não array)
-      try {
-        const k = Core.keys.recorrApplied(userId(), m);
-        const applied = Core.storage.getJSON(k, {});
-        if (applied && typeof applied === 'object' && !Array.isArray(applied)) {
-          delete applied[recurrenceId];
-          Core.storage.setJSON(k, applied);
-        }
-      } catch {}
-    });
-
-    // remove template de recorrência
-    const rec = loadRecorrentes().filter((r) => r.id !== recurrenceId);
-    saveRecorrentes(rec);
-  }
-
-// -------------------------------
+  // -------------------------------
   // FIXAR (RECORRÊNCIA)
   // -------------------------------
   let pinningId = null;
@@ -707,7 +495,8 @@
 
         const t = rec.template;
         const day = Core.month.clampDay(activeMonth, t.day || 1);
-        tx.push(buildTxRecord({
+        tx.push({
+          id: uid(),
           tipo: t.tipo,
           subtipo: t.subtipo || undefined,
           data: `${activeMonth}-${day}`,
@@ -717,7 +506,7 @@
           descricao: t.descricao || '',
           auto: true,
           recurrenceId: rec.id
-        }));
+        });
         saveTx(tx);
         render();
       }
@@ -731,30 +520,11 @@
   // NAV MONTH
   // -------------------------------
   function setDefaultDates() {
-    // Regra (v8.2.1): lançamentos limitados ao mês ativo para evitar distorções nos KPIs.
-    // Define min/max em todos inputs type=date e aplica um valor default dentro do intervalo.
-
-    const monthId = String(activeMonth || '').trim();
-    const days = Core.month.daysInMonth(monthId);
-    const first = `${monthId}-01`;
-    const last = `${monthId}-${String(days).padStart(2, '0')}`;
-
     const today = new Date().toISOString().split('T')[0];
-    const clamp = (d) => (d >= first && d <= last) ? d : first;
-    const val = clamp(today);
-
-    const ids = ['receitaData', 'poupancaData', 'despesaData', 'dividaData'];
-    ids.forEach((id) => {
-      const el = $(id);
-      if (!el) return;
-      try {
-        el.min = first;
-        el.max = last;
-        // Se o valor atual estiver fora do range (ou vazio), clampa.
-        const cur = String(el.value || '').trim();
-        el.value = (cur && cur >= first && cur <= last) ? cur : val;
-      } catch {}
-    });
+    if ($('receitaData')) $('receitaData').value = today;
+    if ($('poupancaData')) $('poupancaData').value = today;
+    if ($('despesaData')) $('despesaData').value = today;
+    if ($('dividaData')) $('dividaData').value = today;
   }
 
   function loadMonth(monthId) {
@@ -764,7 +534,6 @@
 
     // persiste selected_month por usuário
     Core.selectedMonth.set(userId(), activeMonth);
-    try { window.SyncService?.markDirty?.('selected-month'); } catch {}
 
     setDefaultDates();
     render();
@@ -773,7 +542,7 @@
   // -------------------------------
   // INIT
   // -------------------------------
-  async function init() {
+  function init() {
     // theme apply (não executa sozinho)
     try { ERP.theme.apply(); } catch {}
 
@@ -783,65 +552,55 @@
     if (user?.nome && userName) userName.textContent = `Olá, ${String(user.nome).split(' ')[0]}`;
 
     // binds
-    if (btnPrevMonth) btnPrevMonth.addEventListener('click', async () => {
+    if (btnPrevMonth) btnPrevMonth.addEventListener('click', () => {
       const [y, m] = activeMonth.split('-').map(Number);
       loadMonth(Core.month.getMonthId(new Date(y, m - 2, 1)));
     });
 
-    if (btnNextMonth) btnNextMonth.addEventListener('click', async () => {
+    if (btnNextMonth) btnNextMonth.addEventListener('click', () => {
       const [y, m] = activeMonth.split('-').map(Number);
       loadMonth(Core.month.getMonthId(new Date(y, m, 1)));
     });
 
-    if (btnCurrentMonth) btnCurrentMonth.addEventListener('click', async () => {
+    if (btnCurrentMonth) btnCurrentMonth.addEventListener('click', () => {
       Core.selectedMonth.clear(userId());
       loadMonth(Core.month.getMonthId(new Date()));
     });
 
-    if (btnPerfil) btnPerfil.addEventListener('click', async () => window.location.href = 'perfil.html');
-    if (btnGerenciadores) btnGerenciadores.addEventListener('click', async () => window.location.href = 'gerenciadores.html');
-    if (btnHistorico) btnHistorico.addEventListener('click', async () => window.location.href = 'historico.html');
-    if (btnCharts) btnCharts.addEventListener('click', async () => window.location.href = 'charts.html');
-    if (btnConsolidado) btnConsolidado.addEventListener('click', async () => window.location.href = 'consolidado.html');
-    if (btnMetas) btnMetas.addEventListener('click', async () => window.location.href = 'metas.html');
+    if (btnPerfil) btnPerfil.addEventListener('click', () => window.location.href = 'perfil.html');
+    if (btnHistorico) btnHistorico.addEventListener('click', () => window.location.href = 'historico.html');
+    if (btnCharts) btnCharts.addEventListener('click', () => window.location.href = 'charts.html');
+    if (btnConsolidado) btnConsolidado.addEventListener('click', () => window.location.href = 'consolidado.html');
+    if (btnMetas) btnMetas.addEventListener('click', () => window.location.href = 'metas.html');
 
-    
-    if (btnExportCSVMonth) btnExportCSVMonth.addEventListener('click', async () => {
-      const rows = (tx || []).map((t) => Core.export.txToRow({ ...t, __monthId: activeMonth }));
-      const header = Core.export.txHeader();
-      const res = Core.export.downloadCSV(`erp-jw-${userId()}-${activeMonth}.csv`, rows, header);
-      if (!res.ok) return ERP.toast(res.error || 'Sem dados para exportar.', 'info');
-      ERP.toast('✓ CSV exportado!', 'success');
-    });
-
-if (btnLimparMes) btnLimparMes.addEventListener('click', async () => {
+    if (btnLimparMes) btnLimparMes.addEventListener('click', () => {
       if (!confirm(`⚠️ ATENÇÃO!\n\nIsso vai apagar TODOS os lançamentos de ${Core.month.getMonthLabel(activeMonth)}.\n\nEsta ação não pode ser desfeita. Confirmar?`)) return;
-      tx.forEach((item) => {
-        item.deletedAt = new Date().toISOString();
-        item.updatedAt = item.deletedAt;
-        item.deviceId = window.SyncService?.getDeviceId?.() || item.deviceId || 'local-device';
-        item.schemaVersion = window.SyncService?.TX_SCHEMA_VERSION || item.schemaVersion || 1;
-      });
+      tx = [];
       saveTx(tx);
       render();
       ERP.toast('✓ Todos os dados do mês foram removidos!', 'info');
     });
 
     if (logoutBtn) logoutBtn.addEventListener('click', async () => {
-  if (!confirm('Deseja realmente sair?')) return;
+      if (!confirm('Deseja realmente sair?')) return;
 
-  try {
-    await window.firebaseApi?.signOut?.();
-  } catch (e) {
-    console.warn('[Logout] Falha ao encerrar sessão Firebase:', e);
-  }
+      try {
+        await window.firebaseApi?.signOut?.();
+      } catch (e) {
+        console.warn('[Logout] Falha ao encerrar sessão Firebase:', e);
+      }
 
-  localStorage.removeItem('gf_erp_firebase_rest_session');
-  Core.user.clearSession();
-  window.location.href = 'index.html';
-});
+      localStorage.removeItem('gf_erp_firebase_rest_session');
+      localStorage.removeItem('gf_erp_logged');
+      localStorage.removeItem('gf_erp_current_userId');
 
-    // forms
+      if (window.Core?.user?.clearSession) {
+        Core.user.clearSession();
+      }
+
+      window.location.replace('index.html');
+    });
+// forms
     if (formPoupanca) formPoupanca.addEventListener('submit', (e) => {
       e.preventDefault();
       const f = e.target;
@@ -890,17 +649,14 @@ if (btnLimparMes) btnLimparMes.addEventListener('click', async () => {
         subtipo: despesaSubtipo?.value,
         data: f.data.value,
         valor: f.valor.value,
-        categoriaId: despesaCategoria?.value,
-        categoria: despesaCategoria?.selectedOptions?.[0]?.textContent || '',
+        categoria: despesaCategoria?.value,
         banco: $('despesaBanco')?.value,
         descricao: ($('despesaDescricao')?.value || '').trim()
       });
 
       f.reset();
       if (despesaSubtipo) despesaSubtipo.value = '';
-      if (despesaCategoria) { refreshFormSelects(); despesaCategoria.value=''; }
-      document.getElementById('overrideDespesaTipo') && (document.getElementById('overrideDespesaTipo').checked=false);
-      syncDespesaTipoFromCategoria();
+      if (despesaCategoria) despesaCategoria.innerHTML = `<option value="">Selecione tipo primeiro</option>`;
       ERP.toast('✓ Despesa adicionada!', 'success');
       setDefaultDates();
     });
@@ -924,38 +680,27 @@ if (btnLimparMes) btnLimparMes.addEventListener('click', async () => {
       setDefaultDates();
     });
 
-    // selects (v6.5)
-    function refreshFormSelects() {
-      setOptions($('poupancaCategoria'), getActiveCategories('poupanca'));
-      setOptions($('poupancaBanco'), getActiveBanks('poupanca'));
+    // selects
+    setOptions($('poupancaCategoria'), getActiveCategories('poupanca'));
+    setOptions($('poupancaBanco'), getActiveBanks('poupanca'));
 
-      setOptions($('receitaCategoria'), getActiveCategories('receita'));
-      setOptions($('receitaBanco'), getActiveBanks('receita'));
+    setOptions($('receitaCategoria'), getActiveCategories('receita'));
+    setOptions($('receitaBanco'), getActiveBanks('receita'));
 
-      setOptions($('despesaBanco'), getActiveBanks('despesa'));
+    setOptions($('despesaBanco'), getActiveBanks('despesa'));
 
-      // Despesas (novo fluxo v8)
-      setOptions(despesaCategoria, buildExpenseOptions());
-      syncDespesaTipoFromCategoria();
+    setOptions($('dividaCategoria'), getActiveCategories('divida'));
+    setOptions($('dividaBanco'), getActiveBanks('divida'));
 
-      setOptions($('dividaCategoria'), getActiveCategories('divida'));
-      setOptions($('dividaBanco'), getActiveBanks('divida'));
+    if (despesaCategoria) despesaCategoria.innerHTML = `<option value="">Selecione tipo primeiro</option>`;
+    if (despesaSubtipo && despesaCategoria) {
+      despesaSubtipo.addEventListener('change', () => {
+        if (despesaSubtipo.value === 'essencial') setOptions(despesaCategoria, getActiveCategories('despesa_essencial'));
+        else if (despesaSubtipo.value === 'livre') setOptions(despesaCategoria, getActiveCategories('despesa_livre'));
+        else despesaCategoria.innerHTML = `<option value="">Selecione tipo primeiro</option>`;
+      });
     }
 
-    refreshFormSelects();
-
-    // Despesas: categoria -> tipo (auto) + override manual
-    despesaCategoria?.addEventListener('change', syncDespesaTipoFromCategoria);
-    document.getElementById('overrideDespesaTipo')?.addEventListener('change', syncDespesaTipoFromCategoria);
-
-    // Atualiza selects quando categorias/bancos mudarem no Perfil (sem recarregar)
-    document.addEventListener('erp_cfg_changed', () => {
-      try { refreshFormSelects();
-
-    // Despesas: categoria -> tipo (auto) + override manual
-    despesaCategoria?.addEventListener('change', syncDespesaTipoFromCategoria);
-    document.getElementById('overrideDespesaTipo')?.addEventListener('change', syncDespesaTipoFromCategoria); } catch {}
-    });
     // tabela delegation
     if (tbody) tbody.addEventListener('click', (e) => {
       const target = e.target;
@@ -986,10 +731,10 @@ if (btnLimparMes) btnLimparMes.addEventListener('click', async () => {
     applyRecorrentesForMonth(activeMonth);
     tx = loadTx(activeMonth);
     Core.selectedMonth.set(userId(), activeMonth);
-    try { window.SyncService?.markDirty?.('selected-month'); } catch {}
 
     setDefaultDates();
     render();
   }
-  boot().catch((e)=>console.error('[Dashboard] boot error:', e));
+
+  boot();
 })();
