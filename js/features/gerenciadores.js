@@ -12,9 +12,26 @@
     try { await window.SyncService?.start(Core.user.getCurrentUserId()); } catch (err) { console.warn('[Gerenciadores] SyncService indisponível:', err); }
 
     const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) logoutBtn.addEventListener('click', () => { Core.user.clearSession(); window.location.href = 'index.html'; });
+    if (logoutBtn) logoutBtn.addEventListener('click', async () => {
+      if (!confirm('Deseja realmente sair?')) return;
 
-    const catGrupo = document.getElementById('catGrupo');
+      try {
+        await window.firebaseApi?.signOut?.();
+      } catch (e) {
+        console.warn('[Logout] Falha ao encerrar sessão Firebase:', e);
+      }
+
+      localStorage.removeItem('gf_erp_firebase_rest_session');
+      localStorage.removeItem('gf_erp_logged');
+      localStorage.removeItem('gf_erp_current_userId');
+
+      if (window.Core?.user?.clearSession) {
+        Core.user.clearSession();
+      }
+
+      window.location.replace('index.html');
+    });
+const catGrupo = document.getElementById('catGrupo');
     const bankTipo = document.getElementById('bankTipo');
 
     const catBody = document.getElementById('catLista');
